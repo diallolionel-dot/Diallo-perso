@@ -1,7 +1,7 @@
 /**
- * Types de la base Supabase, alignés sur supabase/migrations/20261029000000_init.sql.
+ * Types de la base Supabase, alignés sur supabase/migrations/.
  *
- * Écrits à la main en phase 1. Une fois le projet Supabase créé, les régénérer avec :
+ * Écrits à la main (migrations des phases 1 et 2). Une fois le projet Supabase créé, les régénérer avec :
  *   npx supabase gen types typescript --project-id <id> > src/types/database.ts
  */
 
@@ -10,11 +10,19 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 type Timestamps = { created_at: string };
 
 /** Construit Row / Insert / Update à partir des colonnes et des champs facultatifs à l'insertion. */
-type TableDef<Row, OptionalOnInsert extends keyof Row> = {
+type Relationship = {
+  foreignKeyName: string;
+  columns: string[];
+  isOneToOne: boolean;
+  referencedRelation: string;
+  referencedColumns: string[];
+};
+
+type TableDef<Row, OptionalOnInsert extends keyof Row, Relationships extends Relationship[] = []> = {
   Row: Row;
   Insert: Omit<Row, OptionalOnInsert> & Partial<Pick<Row, OptionalOnInsert>>;
   Update: Partial<Row>;
-  Relationships: [];
+  Relationships: Relationships;
 };
 
 type ProfileRow = Timestamps & {
@@ -38,6 +46,7 @@ type WeightEntryRow = Timestamps & {
   measured_at: string;
   weight_kg: number;
   body_fat_pct: number | null;
+  photo_path: string | null;
   note: string | null;
 };
 
@@ -111,6 +120,9 @@ type DailyCheckinRow = Timestamps & {
   energy: number | null;
   stress: number | null;
   hunger: number | null;
+  pain_level: number | null;
+  pain_zone: string | null;
+  work_load: number | null;
   note: string | null;
   updated_at: string;
 };
@@ -147,7 +159,19 @@ export type Database = {
         WorkoutRow,
         Nullable<WorkoutRow> | "id" | "user_id" | "started_at" | "duration_min" | "is_planned_rest" | "created_at" | "updated_at"
       >;
-      workout_exercises: TableDef<WorkoutExerciseRow, "id" | "user_id" | "position" | "sets" | "created_at">;
+      workout_exercises: TableDef<
+        WorkoutExerciseRow,
+        "id" | "user_id" | "position" | "sets" | "created_at",
+        [
+          {
+            foreignKeyName: "workout_exercises_workout_id_fkey";
+            columns: ["workout_id"];
+            isOneToOne: false;
+            referencedRelation: "workouts";
+            referencedColumns: ["id"];
+          },
+        ]
+      >;
       body_measurements: TableDef<BodyMeasurementRow, Nullable<BodyMeasurementRow> | "id" | "user_id" | "measured_on" | "created_at">;
       progress_photos: TableDef<ProgressPhotoRow, Nullable<ProgressPhotoRow> | "id" | "user_id" | "taken_on" | "created_at">;
       daily_checkins: TableDef<DailyCheckinRow, Nullable<DailyCheckinRow> | "id" | "user_id" | "created_at" | "updated_at">;
@@ -162,6 +186,8 @@ export type Database = {
         Args: { p_action: string; p_occurred_on: string; p_source_id?: string | null };
         Returns: number;
       };
+      check_consistency_week: { Args: { p_today: string }; Returns: number };
+      refresh_achievements: { Args: Record<string, never>; Returns: string[] };
       export_my_data: { Args: Record<string, never>; Returns: Json };
       delete_my_data: { Args: Record<string, never>; Returns: undefined };
     };

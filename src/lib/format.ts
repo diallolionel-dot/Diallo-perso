@@ -17,3 +17,11 @@ export function formatDelta(value: number, digits = 1): string {
   if (value < 0) return `−${abs}`;
   return abs;
 }
+
+/** Durée lisible : « 45 min », « 1 h », « 14 h 30 ». */
+export function formatDuration(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h === 0) return `${m} min`;
+  return m === 0 ? `${h} h` : `${h} h ${m.toString().padStart(2, "0")}`;
+}

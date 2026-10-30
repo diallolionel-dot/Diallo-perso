@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 /** Barre de navigation basse, pensée pour le pouce. */
 export function BottomNav() {
   const pathname = usePathname();
+  if (pathname === "/connexion") return null;
 
   return (
     <nav

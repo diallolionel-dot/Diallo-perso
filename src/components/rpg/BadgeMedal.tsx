@@ -1,5 +1,5 @@
 import { Lock, Shield } from "lucide-react";
-import type { BadgeRarity } from "@/lib/demo/data";
+import type { BadgeRarity } from "@/lib/rpg/achievements";
 import { cn } from "@/lib/cn";
 
 const rarityClasses: Record<BadgeRarity, string> = {

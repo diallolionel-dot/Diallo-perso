@@ -8,8 +8,7 @@ import { SupabaseNotConfiguredError, getSupabaseAdminEnv, getSupabaseEnv } from 
 /**
  * Client Supabase lié à la session de l'utilisateur (cookies httpOnly).
  * Toutes les requêtes sont soumises à la Row Level Security.
- *
- * Phase 1 : prêt mais non utilisé par les écrans (données de démonstration).
+ * Passer par `getSession()` (lib/auth/session) pour obtenir un utilisateur vérifié.
  */
 export async function createSupabaseServerClient() {
   const env = getSupabaseEnv();
@@ -29,7 +28,7 @@ export async function createSupabaseServerClient() {
           }
         } catch {
           // Appelé depuis un Server Component : les cookies sont en lecture seule.
-          // Le rafraîchissement de session sera assuré par le proxy (phase 2).
+          // Le rafraîchissement de session est assuré par le proxy (src/proxy.ts).
         }
       },
     },

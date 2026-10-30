@@ -14,6 +14,6 @@ trap 'psql "$PGURL" -q -c "drop database if exists $DB" >/dev/null' EXIT
 {
   echo "\\connect $DB"
   cat "$ROOT/supabase/tests/00_supabase_stubs.sql" \
-    "$ROOT/supabase/migrations/20261029000000_init.sql" \
-    "$ROOT/supabase/tests/01_security_test.sql"
-} | psql "$PGURL" -v ON_ERROR_STOP=1 -q -t 2>&1 | grep -E "OK|ÉCHEC|RÉUSSI|ERROR"
+    "$ROOT"/supabase/migrations/*.sql \
+    "$ROOT"/supabase/tests/0[1-9]_*.sql
+} | psql "$PGURL" -v ON_ERROR_STOP=1 -q -t 2>&1 | grep -E "OK|ÉCHEC|RÉUSSI|ERROR" | sed "s/^.*NOTICE:  //"

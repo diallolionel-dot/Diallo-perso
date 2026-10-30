@@ -7,7 +7,7 @@ export function SystemStatus() {
   const supabase = isSupabaseConfigured();
   const rows = [
     { label: "Base de données (Supabase)", ok: supabase, on: "Configurée", off: "Non configurée" },
-    { label: "Enregistrement des saisies", ok: false, on: "Actif", off: "Phase 2" },
+    { label: "Enregistrement des saisies", ok: supabase, on: "Actif", off: "Mode démo" },
     { label: "Analyse IA des photos & Mentor", ok: false, on: "Actif", off: "Phase 3" },
   ];
 

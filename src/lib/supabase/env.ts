@@ -1,46 +1,29 @@
 import "server-only";
-import { z } from "zod";
+import { readSupabaseAdminEnv, readSupabaseEnv, type SupabaseAdminEnv, type SupabaseEnv } from "./config";
 
 /**
  * Variables d'environnement Supabase — lues UNIQUEMENT côté serveur.
- *
- * Aucune n'est préfixée NEXT_PUBLIC_ : elles ne sont jamais incluses dans
- * le JavaScript envoyé au navigateur. Toutes les requêtes Supabase passent
- * par le serveur Next.js (Server Components, Server Actions, Route Handlers).
+ * Toutes les requêtes Supabase passent par le serveur Next.js
+ * (Server Components, Server Actions, Route Handlers, proxy).
  */
-const supabaseEnvSchema = z.object({
-  SUPABASE_URL: z.url(),
-  SUPABASE_PUBLISHABLE_KEY: z.string().min(20),
-});
-
-const supabaseAdminEnvSchema = supabaseEnvSchema.extend({
-  SUPABASE_SECRET_KEY: z.string().min(20),
-});
-
-export type SupabaseEnv = z.infer<typeof supabaseEnvSchema>;
-export type SupabaseAdminEnv = z.infer<typeof supabaseAdminEnvSchema>;
+export type { SupabaseAdminEnv, SupabaseEnv };
 
 /** Renvoie la configuration Supabase, ou `null` si elle est absente (mode démo). */
 export function getSupabaseEnv(): SupabaseEnv | null {
-  const parsed = supabaseEnvSchema.safeParse({
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY,
-  });
-  return parsed.success ? parsed.data : null;
+  return readSupabaseEnv();
 }
 
 /** Configuration avec la clé secrète (opérations d'administration, ex. suppression du compte). */
 export function getSupabaseAdminEnv(): SupabaseAdminEnv | null {
-  const parsed = supabaseAdminEnvSchema.safeParse({
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY,
-    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
-  });
-  return parsed.success ? parsed.data : null;
+  return readSupabaseAdminEnv();
 }
 
 export function isSupabaseConfigured(): boolean {
   return getSupabaseEnv() !== null;
+}
+
+export function isAdminConfigured(): boolean {
+  return getSupabaseAdminEnv() !== null;
 }
 
 export class SupabaseNotConfiguredError extends Error {

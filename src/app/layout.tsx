@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Cinzel, Inter } from "next/font/google";
+import { Suspense } from "react";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { XpToast } from "@/components/rpg/XpToast";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -57,6 +59,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <BottomNav />
+        <Suspense>
+          <XpToast />
+        </Suspense>
         <ServiceWorkerRegister />
       </body>
     </html>

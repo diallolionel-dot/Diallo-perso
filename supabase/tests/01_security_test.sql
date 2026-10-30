@@ -70,4 +70,4 @@ select pg_temp.expect_eq((select count(*) from public.weight_entries) + (select 
 reset role;
 delete from auth.users where id = '11111111-1111-1111-1111-111111111111';
 select pg_temp.expect_eq((select count(*) from public.profiles), 1, 'suppression du compte en cascade');
-\echo TOUS LES TESTS SQL ONT RÉUSSI
+\echo TESTS PHASE 1 RÉUSSIS
